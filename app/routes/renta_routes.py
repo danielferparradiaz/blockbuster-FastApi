@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from datetime import date, timedelta
 
 from app.config.mysql import SessionLocal
-from app.domain import models        
+from app.domain.models import models
 from app.cruds import crudRenta as crud  
+
 
 router = APIRouter(prefix="/renta", tags=["Rentas"])
 
