@@ -4,7 +4,11 @@ from app.domain.models import models
 from app.routes import renta_routes
 
 
-app = FastAPI(title="Blockbuster API", version="1.0")
+app = FastAPI(
+    title="🎬 Blockbuster Graph API",
+    version="1.0 (MYSQL Edition)",
+    description="Implementación del modelo Blockbuster usando base de datos MySQL"
+)
 
 app.include_router(renta_routes.router)
 
