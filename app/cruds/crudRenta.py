@@ -1,62 +1,56 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import func
 from datetime import date, timedelta
 
-from app.domain.models import models
-from app.domain import schemas
+# ========================
+# CREATE - Crear Renta
+# ========================
+def crear_renta(session, id_afiliado: int, id_copia: int, id_titulo: int):
+    query = """
+    MATCH (a:Afiliado {IdAfiliado: $id_afiliado})
+    MATCH (t:Titulo {IdTitulo: $id_titulo})
+    MATCH (c:Copia {IdCopia: $id_copia})-[:COPIA_DE]->(t)
+    CREATE (r:Renta {
+        IdRenta: randomUUID(),
+        FechaRenta: date(),
+        FechaDevolucion: date() + duration({days: 2}),
+        ValorRenta: 5000.00,
+        Estado: 'ACTIVA'
+    })
+    CREATE (a)-[:REALIZO_RENTA]->(r)
+    CREATE (r)-[:INCLUYE_TITULO]->(t)
+    CREATE (r)-[:INCLUYE_COPIA]->(c)
+    SET c.Estado = 'RENTADA'
+    RETURN r.IdRenta AS id_renta
+    """
+    result = session.run(query, id_afiliado=id_afiliado, id_copia=id_copia, id_titulo=id_titulo)
+    return result.single()["id_renta"]
 
 
-# CREATE
-def crear_renta(db: Session, id_afiliado: int, id_copia: int, id_titulo: int):
-    renta = models.Renta(
-        id_afiliado=id_afiliado,
-        id_copia=id_copia,
-        id_titulo=id_titulo,
-        fecha_renta=date.today(),
-        fecha_devolucion=date.today() + timedelta(days=2),
-        valor_renta=5000.00
-    )
-    db.add(renta)
-
-    copia = db.query(models.CopiaTitulo).filter_by(
-        id_copia=id_copia, id_titulo=id_titulo
-    ).first()
-    if copia:
-        copia.estado = models.EstadoEnum.RENTADA
-
-    db.commit()
-    db.refresh(renta)
-    return renta
-
-# READ
-def obtener_rentas(db: Session):
-    return db.query(models.Renta).all()
+# ========================
+# READ - Historial de rentas
+# ========================
+def obtener_historial_rentas(session):
+    query = """
+    MATCH (a:Afiliado)-[:REALIZO_RENTA]->(r:Renta)-[:INCLUYE_TITULO]->(t:Titulo)
+    RETURN
+        toUpper(a.Nombres) + ' ' + toUpper(a.Apellidos) AS Afiliado,
+        t.Titulo AS Titulo,
+        date(r.FechaRenta) AS FechaRenta,
+        duration.between(r.FechaRenta, r.FechaDevolucion).days AS DuracionDias
+    ORDER BY r.FechaRenta DESC
+    """
+    return [record.data() for record in session.run(query)]
 
 
-# Consulta 1: Historia de rentas por afiliado
-def obtener_historial_rentas(db: Session):
-    query = db.query(
-        func.upper(models.Afiliado.nombres).label("Nombres"),
-        func.upper(models.Afiliado.apellidos).label("Apellidos"),
-        func.concat(
-            func.upper(func.left(models.Titulo.titulo, 1)),
-            func.lower(func.substring(models.Titulo.titulo, 2))
-        ).label("Titulo"),
-        func.date_format(models.Renta.fecha_renta, "%d de %M de %Y").label("FechaRenta"),
-        func.datediff(models.Renta.fecha_devolucion, models.Renta.fecha_renta).label("DuracionDias")
-    ).join(models.Renta, models.Renta.id_afiliado == models.Afiliado.id_afiliado)\
-     .join(models.Titulo, models.Renta.id_titulo == models.Titulo.id_titulo)
-
-    return query.all()
-
-# Consulta 2: Cantidad y totales de rentas por título
-def obtener_estadisticas_rentas(db: Session):
-    query = db.query(
-        models.Titulo.titulo.label("Titulo"),
-        func.count(models.Renta.id_renta).label("CantidadRentas"),
-        func.sum(models.Renta.valor_renta).label("TotalRentas"),
-        func.sum(func.coalesce(models.Renta.valor_recargo, 0)).label("TotalRecargos")
-    ).join(models.Titulo, models.Renta.id_titulo == models.Titulo.id_titulo)\
-     .group_by(models.Titulo.titulo)
-
-    return query.all()
+# ========================
+# READ - Estadísticas de rentas
+# ========================
+def obtener_estadisticas_rentas(session):
+    query = """
+    MATCH (r:Renta)-[:INCLUYE_TITULO]->(t:Titulo)
+    RETURN
+        t.Titulo AS Titulo,
+        count(r) AS CantidadRentas,
+        sum(r.ValorRenta) AS TotalRentas
+    ORDER BY CantidadRentas DESC
+    """
+    return [record.data() for record in session.run(query)]
