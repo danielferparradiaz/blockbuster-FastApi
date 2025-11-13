@@ -9,6 +9,8 @@ def crear_renta(id_afiliado: int, id_copia: int, id_titulo: int, session = Depen
     renta_id = crud.crear_renta(session, id_afiliado, id_copia, id_titulo)
     return {"message": "Renta creada en Neo4j", "id_renta": renta_id}
 
+
+
 @router.get("/historial")
 def historial_rentas(session = Depends(get_session)):
     return crud.obtener_historial_rentas(session)

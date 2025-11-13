@@ -84,15 +84,16 @@ CREATE
   (fDVD:Formato {nombre:'DVD'}),
   (fBlu:Formato {nombre:'BLUERAY'}),
 
-  (c1t92:Copia {IdCopia:1, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fDVD),
-  (c1t93:Copia {IdCopia:1, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fDVD),
-  (c2t93:Copia {IdCopia:2, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fBlu),
-  (c1t94:Copia {IdCopia:1, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fDVD),
-  (c1t95:Copia {IdCopia:1, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fDVD),
-  (c2t95:Copia {IdCopia:2, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fBlu),
-  (c3t95:Copia {IdCopia:3, Estado:'RENTADA'})-[:DE_FORMATO]->(fBlu),
-  (c1t96:Copia {IdCopia:1, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fBlu),
-  (c1t97:Copia {IdCopia:1, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fBlu);
+  (c1t92:Copia {IdCopia:101, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fDVD),
+  (c1t93:Copia {IdCopia:201, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fDVD),
+  (c2t93:Copia {IdCopia:202, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fBlu),
+  (c1t94:Copia {IdCopia:301, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fDVD),
+  (c1t95:Copia {IdCopia:401, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fDVD),
+  (c2t95:Copia {IdCopia:402, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fBlu),
+  (c3t95:Copia {IdCopia:403, Estado:'RENTADA'})-[:DE_FORMATO]->(fBlu),
+  (c1t96:Copia {IdCopia:501, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fBlu),
+  (c1t97:Copia {IdCopia:601, Estado:'DISPONIBLE'})-[:DE_FORMATO]->(fBlu);
+
 
 // Relación entre Copias y Títulos
 CREATE
@@ -114,7 +115,8 @@ CREATE
     ValorRenta:5000.00, MetodoPago:'Tarjeta', Estado:'FINALIZADA'
   })
 WITH r1
-MATCH (a101:Afiliado {IdAfiliado:101}), (t92:Titulo {IdTitulo:92}), (c1t92:Copia {IdCopia:1})
+// La línea corregida está aquí
+MATCH (a101:Afiliado {IdAfiliado:101}), (t92:Titulo {IdTitulo:92}), (c1t92:Copia {IdCopia:101}) 
 CREATE
   (a101)-[:REALIZO_RENTA]->(r1),
   (r1)-[:INCLUYE_TITULO]->(t92),
