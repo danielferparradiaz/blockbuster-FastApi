@@ -122,6 +122,9 @@ CREATE
   (r1)-[:INCLUYE_TITULO]->(t92),
   (r1)-[:INCLUYE_COPIA]->(c1t92);
 
+MATCH (t:Titulo {IdTitulo: 92})
+CREATE (c1:Copia {IdCopia: 201, Estado:'DISPONIBLE'})-[:COPIA_DE]->(t);
+
 // =========================================
 // 🌟 BONUS: Añadimos algunos gustos
 MATCH (a103:Afiliado), (catFiccion:Categoria)
@@ -132,3 +135,4 @@ CREATE (a106)-[:LE_GUSTA]->(catAccion);
 
 MATCH (a107:Afiliado), (catSuspenso:Categoria)
 CREATE (a107)-[:LE_GUSTA]->(catSuspenso);
+
