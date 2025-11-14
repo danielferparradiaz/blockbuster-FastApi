@@ -17,6 +17,7 @@ Asegúrate de tener instalado:
 
 ## 🗂️ Estructura del proyecto
 
+```
 blockbuster-python/
 │
 ├── app/
@@ -34,20 +35,27 @@ blockbuster-python/
 │
 ├── requirements.txt
 └── README.md
+```
 
 
 ## Instalar dependencias
+```bash
 pip install -r requirements.txt
+```
 
 
 ## Configurar Neo4j
 
-Edita tu archivo app/database.py y coloca tus credenciales:
+Edita tu archivo `app/database.py` y coloca tus credenciales:
 
+```bash
 NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USER = "neo4j"
 NEO4J_PASSWORD = "tu_password"
+```
 
 
 ## Probar el proyecto con:
+```bash
 uvicorn app.main:app --reload
+```
