@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-from app.config.mysql import engine, Base
-from app.domain.models import models
 from app.routes import renta_routes
 
 app = FastAPI(

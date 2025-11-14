@@ -1,53 +1,65 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from datetime import date, timedelta
+from fastapi import APIRouter, Depends, HTTPException
+# from sqlalchemy.orm import Session # Ya no se usa
+# from datetime import date, timedelta # Ya no se usa para crear la visualización
 
-from app.config.mysql import SessionLocal
-from app.domain.models import models
-from app.cruds import crudRenta as crud  
+# Asegúrate de que esta función exista y devuelva una sesión de Neo4j
+# from app.config.mysql import SessionLocal # Ya no se usa
+# from app.domain.models import models # Ya no se usa
+from app.config.neo4j import get_session # ASUME que tienes esta función
+from app.cruds import crudVisualizacion as crud  # Renombrado a crudVisualizacion
 # from app.auth.oauth2 import get_current_user
 from app.auth.jwt_manager import auth_required
 
+# --- Definición del Router ---
+# Cambiamos el prefijo y el tag de "renta" a "visualizacion"
+router = APIRouter(prefix="/visualizacion", tags=["Visualizaciones (Neo4j)"])
 
-router = APIRouter(prefix="/renta", tags=["Rentas"])
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-router = APIRouter(prefix="/renta", tags=["Rentas (Neo4j)"])
+# ----------------------------------------------------
+# 🎬 Endpoints CRUD
+# ----------------------------------------------------
 
 @router.post("/")
-def crear_renta(id_afiliado: int, id_copia: int, id_titulo: int, db: Session = Depends(get_db)):
-    nueva_renta = models.Renta(
-        id_afiliado=id_afiliado,
-        id_copia=id_copia,
-        id_titulo=id_titulo,
-        fecha_renta=date.today(),
-        fecha_devolucion=date.today() + timedelta(days=2),
-        valor_renta=5000.00,
-        valor_recargo=None
-    )
-    db.add(nueva_renta)
-
-    # Actualizar estado de la copia
-    copia = db.query(models.CopiaTitulo).filter_by(id_copia=id_copia, id_titulo=id_titulo).first()
-    if copia:
-        copia.estado = models.EstadoEnum.RENTADA
-
-    db.commit()
-    db.refresh(nueva_renta)
-    return {"message": "Renta creada", "renta": nueva_renta.id_renta}
+def crear_visualizacion(
+    id_afiliado: int,
+    id_titulo: int,
+    # Eliminamos id_copia, ya que la visualización es digital y no requiere una copia física
+    # Inyectamos la sesión de Neo4j
+    session = Depends(get_session) 
+):
+    """
+    Crea una nueva Visualización (antes Renta) en Neo4j.
+    """
+    try:
+        # Usamos la nueva función del CRUD que acepta id_afiliado e id_titulo
+        resultado = crud.crear_visualizacion(session, id_afiliado, id_titulo)
+        
+        return {
+            "message": "Visualización creada exitosamente",
+            "id_visualizacion": resultado["id_visualizacion"]
+        }
+    except ValueError as e:
+        # Captura errores de validación (Afiliado/Título no encontrado)
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        # Captura errores de la base de datos
+        raise HTTPException(status_code=500, detail="Error al crear la visualización: " + str(e))
 
 
 @router.get("/historial")
-def historial_rentas(session = Depends(get_session)):
-    return crud.obtener_historial_rentas(session)
+def historial_visualizaciones(session = Depends(get_session)):
+    """
+    Obtiene el historial de visualizaciones de todos los afiliados.
+    """
+    # Usamos la nueva función renombrada
+    return crud.obtener_historial_visualizaciones(session)
 
 @router.get("/estadisticas")
-def estadisticas_rentas(session = Depends(get_session)):
-    return crud.obtener_estadisticas_rentas(session)
+def estadisticas_visualizaciones(session = Depends(get_session)):
+    """
+    Obtiene estadísticas sobre la cantidad de visualizaciones por título.
+    """
+    # Usamos la nueva función renombrada
+    return crud.obtener_estadisticas_visualizaciones(session)
+
+# NOTA: Se ha eliminado la función get_db ya que no se usa MySQL/SQLAlchemy
+# NOTA: Se ha eliminado la lógica de actualización de estado de 'CopiaTitulo'

@@ -1,21 +1,16 @@
-# from pydantic import BaseModel
-# from datetime import date
-# from typing import Optional
+class VisualizacionBase(BaseModel):
+    id_afiliado: int
+    id_titulo: int
+    id_copia: int
 
-# class AfiliadoBase(BaseModel):
-#     nombres: str
-#     apellidos: str
-#     direccion: Optional[str] = None
-#     telefono: Optional[str] = None
+class VisualizacionCreate(VisualizacionBase):
+    pass
 
-# class AfiliadoCreate(AfiliadoBase):
-#     fecha_vinculacion: date
-#     sexo: str
-#     fecha_nacimiento: date
-#     id_principal: Optional[int] = None
+class VisualizacionResponse(VisualizacionBase):
+    id_visualizacion: int
+    fecha_inicio: date
+    fecha_fin: date | None
+    estado: str
 
-# class Afiliado(AfiliadoBase):
-#     id_afiliado: int
-
-#     class Config:
-#         orm_mode = True 
+    class Config:
+        orm_mode = True
