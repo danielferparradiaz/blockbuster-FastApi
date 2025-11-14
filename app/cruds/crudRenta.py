@@ -3,7 +3,6 @@ from sqlalchemy import func
 from datetime import date, timedelta
 
 from app.domain.models import models
-from app.domain import schemas
 
 
 # CREATE
