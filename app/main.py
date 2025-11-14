@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.config.mysql import engine, Base
 from app.domain.models import models
 from app.routes import renta_routes
+from app.auth.jwt_manager import create_token
 
 
 app = FastAPI(
@@ -18,3 +19,9 @@ Base.metadata.create_all(bind=engine)
 @app.get("/")
 def root():
     return {"message": "🎬 Bienvenido a la API Blockbuster"}
+
+
+@app.post("/login")
+def login():
+    token = create_token({"user_id": 1, "role": "admin"})
+    return {"token": token}
