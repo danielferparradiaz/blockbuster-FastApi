@@ -1,8 +1,4 @@
 from fastapi import APIRouter, Depends
-<<<<<<< Updated upstream
-from app.config.neo4j import get_session
-from app.cruds import crudRenta as crud
-=======
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
 
@@ -10,6 +6,7 @@ from app.config.mysql import SessionLocal
 from app.domain.models import models
 from app.cruds import crudRenta as crud  
 # from app.auth.oauth2 import get_current_user
+from app.auth.jwt_manager import auth_required
 
 
 router = APIRouter(prefix="/renta", tags=["Rentas"])
@@ -21,19 +18,10 @@ def get_db():
         yield db
     finally:
         db.close()
->>>>>>> Stashed changes
 
 router = APIRouter(prefix="/renta", tags=["Rentas (Neo4j)"])
 
 @router.post("/")
-<<<<<<< Updated upstream
-def crear_renta(id_afiliado: int, id_titulo: int, session = Depends(get_session)):
-    renta_id = crud.crear_renta(session, id_afiliado, id_titulo)
-    return {"message": "Renta creada en Neo4j", "id_renta": renta_id}
-
-=======
-# def crear_renta(id_afiliado: int, id_copia: int, id_titulo: int, db: Session = Depends(get_db),
-#                 usuario = Depends(get_current_user)):
 def crear_renta(id_afiliado: int, id_copia: int, id_titulo: int, db: Session = Depends(get_db)):
     nueva_renta = models.Renta(
         id_afiliado=id_afiliado,
@@ -54,7 +42,6 @@ def crear_renta(id_afiliado: int, id_copia: int, id_titulo: int, db: Session = D
     db.commit()
     db.refresh(nueva_renta)
     return {"message": "Renta creada", "renta": nueva_renta.id_renta}
->>>>>>> Stashed changes
 
 
 @router.get("/historial")
