@@ -48,6 +48,15 @@ CREATE TABLE RENTA (
 );
 
 
+CREATE TABLE USUARIO (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    rol ENUM('ADMIN','USER') DEFAULT 'USER'
+);
+
+
 INSERT INTO AFILIADO VALUES
 (101, 'Antonio', 'Rodríguez', 'Calle 1', '5512573', '2010-01-01', 'M', '1967-04-02', NULL),
 (102, 'Nataly', 'Martínez', 'Calle 1', '5512573', '2010-01-01', 'F', '1967-11-20', 101),

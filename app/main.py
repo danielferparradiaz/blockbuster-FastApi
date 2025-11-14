@@ -1,5 +1,7 @@
 from fastapi import FastAPI
-from app.routes import renta_routes
+from app.config.mysql import engine, Base
+from app.domain.models import models
+from app.routes import renta_routes, auth_routes
 
 app = FastAPI(
     title="🎬 Blockbuster Graph API",
@@ -8,6 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(renta_routes.router)
+# app.include_router(renta_routes.router)
 
 @app.get("/")
 def root():

@@ -1,14 +1,60 @@
 from fastapi import APIRouter, Depends
+<<<<<<< Updated upstream
 from app.config.neo4j import get_session
 from app.cruds import crudRenta as crud
+=======
+from sqlalchemy.orm import Session
+from datetime import date, timedelta
+
+from app.config.mysql import SessionLocal
+from app.domain.models import models
+from app.cruds import crudRenta as crud  
+# from app.auth.oauth2 import get_current_user
+
+
+router = APIRouter(prefix="/renta", tags=["Rentas"])
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+>>>>>>> Stashed changes
 
 router = APIRouter(prefix="/renta", tags=["Rentas (Neo4j)"])
 
 @router.post("/")
+<<<<<<< Updated upstream
 def crear_renta(id_afiliado: int, id_titulo: int, session = Depends(get_session)):
     renta_id = crud.crear_renta(session, id_afiliado, id_titulo)
     return {"message": "Renta creada en Neo4j", "id_renta": renta_id}
 
+=======
+# def crear_renta(id_afiliado: int, id_copia: int, id_titulo: int, db: Session = Depends(get_db),
+#                 usuario = Depends(get_current_user)):
+def crear_renta(id_afiliado: int, id_copia: int, id_titulo: int, db: Session = Depends(get_db)):
+    nueva_renta = models.Renta(
+        id_afiliado=id_afiliado,
+        id_copia=id_copia,
+        id_titulo=id_titulo,
+        fecha_renta=date.today(),
+        fecha_devolucion=date.today() + timedelta(days=2),
+        valor_renta=5000.00,
+        valor_recargo=None
+    )
+    db.add(nueva_renta)
+
+    # Actualizar estado de la copia
+    copia = db.query(models.CopiaTitulo).filter_by(id_copia=id_copia, id_titulo=id_titulo).first()
+    if copia:
+        copia.estado = models.EstadoEnum.RENTADA
+
+    db.commit()
+    db.refresh(nueva_renta)
+    return {"message": "Renta creada", "renta": nueva_renta.id_renta}
+>>>>>>> Stashed changes
 
 
 @router.get("/historial")
