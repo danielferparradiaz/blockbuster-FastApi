@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import renta_routes
+from app.routes import visualizacion_routes, afiliado_routes, titulo_routes
 
 app = FastAPI(
     title="🎬 Blockbuster Graph API",
@@ -12,8 +12,6 @@ def login():
     token = create_token({"user_id": 1, "role": "admin"})
     return {"token": token}
 
-app.include_router(renta_routes.router)
-
-@app.get("/")
-def root():
-    return {"message": "🌐 Bienvenido a Blockbuster Graph API con Neo4j"}
+app.include_router(visualizacion_routes.router)
+app.include_router(afiliado_routes.router)
+app.include_router(titulo_routes.router)
