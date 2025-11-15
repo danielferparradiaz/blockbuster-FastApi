@@ -4,8 +4,8 @@ from fastapi import HTTPException
 
 
 def validate_membership(user: dict):
-    inicio = date.fromisoformat(user["membership_start"])
-    fin = date.fromisoformat(user["membership_end"])
+    inicio = date.fromisoformat(user["FechaInicioMembresia"])
+    fin = date.fromisoformat(user["FechaFinMembresia"])
     hoy = date.today()
 
     if hoy < inicio:

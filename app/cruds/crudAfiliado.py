@@ -2,7 +2,6 @@ from neo4j import Session
 from app.domain.schemas.schemas import AfiliadoCreate, AfiliadoUpdate
 from typing import List, Dict, Any, Optional
 
-# --- CREATE ---
 def crear_afiliado(session: Session, afiliado: AfiliadoCreate) -> Dict[str, Any]:
     query = """
     CREATE (a:Afiliado {
@@ -27,7 +26,6 @@ def crear_afiliado(session: Session, afiliado: AfiliadoCreate) -> Dict[str, Any]
         return record["a"]
     return {}
 
-# --- READ (Todos) ---
 def obtener_afiliados(session: Session) -> List[Dict[str, Any]]:
     query = """
     MATCH (a:Afiliado)
@@ -36,7 +34,6 @@ def obtener_afiliados(session: Session) -> List[Dict[str, Any]]:
     """
     return [record.data() for record in session.run(query)]
 
-# --- READ (Por ID) ---
 def obtener_afiliado_por_id(session: Session, id_afiliado: int) -> Optional[Dict[str, Any]]:
     query = """
     MATCH (a:Afiliado {IdAfiliado: $id_afiliado})
@@ -45,7 +42,6 @@ def obtener_afiliado_por_id(session: Session, id_afiliado: int) -> Optional[Dict
     result = session.run(query, id_afiliado=id_afiliado).single()
     return result["afiliado"] if result else None
 
-# --- UPDATE ---
 def actualizar_afiliado(session: Session, id_afiliado: int, datos: AfiliadoUpdate) -> Optional[Dict[str, Any]]:
     # Filtrar solo los campos que no son None para generar la cláusula SET
     updates = {k: v for k, v in datos.model_dump(exclude_unset=True).items()}
@@ -64,7 +60,6 @@ def actualizar_afiliado(session: Session, id_afiliado: int, datos: AfiliadoUpdat
     result = session.run(query, id_afiliado=id_afiliado, **updates).single()
     return result["afiliado"] if result else None
 
-# --- DELETE ---
 def eliminar_afiliado(session: Session, id_afiliado: int) -> bool:
     query = """
     MATCH (a:Afiliado {IdAfiliado: $id_afiliado})

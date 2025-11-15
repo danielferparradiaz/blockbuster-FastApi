@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from neo4j import Session
-from app.config.neo4j import get_session # ASUME que existe
+from app.config.neo4j import get_session
 from app.cruds import crudAfiliado as crud
 from app.domain.schemas.schemas import AfiliadoCreate, AfiliadoUpdate
 from typing import List, Dict, Any

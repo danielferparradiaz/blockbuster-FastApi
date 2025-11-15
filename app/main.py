@@ -8,7 +8,7 @@ from app.auth.jwt_manager import create_token
 
 
 app = FastAPI(
-    title="🎬 Blockbuster Graph API",
+    title="🎬 Blockbuster API",
     version="2.0",
     description="Implementación del modelo Blockbuster usando Neo4j",
 )
