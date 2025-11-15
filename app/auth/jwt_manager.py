@@ -1,24 +1,35 @@
+# app/auth/jwt_manager.py
 from datetime import datetime, timedelta
+import jwt
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer
-import jwt
 
-SECRET_KEY = "SECRETSCRET"  # cámbialo por uno real
+SECRET_KEY = "SUPER_SECRET_KEY_CHANGE_THIS"
 ALGORITHM = "HS256"
-
+ACCESS_TOKEN_EXPIRE_HOURS = 24
 security = HTTPBearer()
 
-def create_token(data: dict):
-    payload = data.copy()
-    payload["exp"] = datetime.utcnow() + timedelta(hours=24)
+
+def create_token(user_id: int, role: str, membership_start: str, membership_end: str):
+    payload = {
+        "sub": str(user_id),
+        "role": role,
+        "membership_start": membership_start,
+        "membership_end": membership_end,
+        "exp": datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS),
+        "iat": datetime.utcnow()
+    }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-def validate_token(token: str) -> dict:
+
+def decode_token(token: str):
     try:
-        data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return data
-    except Exception as e:
-        raise HTTPException(status_code=401, detail="Token inválido o expirado")
+        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="❌ Token expirado")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="❌ Token inválido")
+
 
 def auth_required(credentials = Depends(security)):
     token = credentials.credentials

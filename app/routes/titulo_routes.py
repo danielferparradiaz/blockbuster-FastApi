@@ -1,8 +1,3 @@
-# ====================================================
-# app/routes/titulo_routes.py
-# Rutas de FastAPI para el CRUD de Titulo
-# ====================================================
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from neo4j import Session
 from app.config.neo4j import get_session # ASUME que existe

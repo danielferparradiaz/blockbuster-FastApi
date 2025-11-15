@@ -1,10 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException
-# from sqlalchemy.orm import Session # Ya no se usa
-# from datetime import date, timedelta # Ya no se usa para crear la visualización
-
-# Asegúrate de que esta función exista y devuelva una sesión de Neo4j
-# from app.config.mysql import SessionLocal # Ya no se usa
-# from app.domain.models import models # Ya no se usa
 from app.config.neo4j import get_session # ASUME que tienes esta función
 from app.cruds import crudVisualizacion as crud  # Renombrado a crudVisualizacion
 # from app.auth.oauth2 import get_current_user
@@ -22,16 +16,11 @@ router = APIRouter(prefix="/visualizacion", tags=["Visualizaciones (Neo4j)"])
 def crear_visualizacion(
     id_afiliado: int,
     id_titulo: int,
-    # Eliminamos id_copia, ya que la visualización es digital y no requiere una copia física
-    # Inyectamos la sesión de Neo4j
-    session = Depends(get_session) 
+    session = Depends(get_session),
+    user = Depends(auth_required)
 ):
-    """
-    Crea una nueva Visualización (antes Renta) en Neo4j.
-    """
     try:
-        # Usamos la nueva función del CRUD que acepta id_afiliado e id_titulo
-        resultado = crud.crear_visualizacion(session, id_afiliado, id_titulo)
+        resultado = crud.crear_visualizacion(session, id_afiliado, id_titulo, user)
         
         return {
             "message": "Visualización creada exitosamente",
@@ -47,17 +36,11 @@ def crear_visualizacion(
 
 @router.get("/historial")
 def historial_visualizaciones(session = Depends(get_session)):
-    """
-    Obtiene el historial de visualizaciones de todos los afiliados.
-    """
     # Usamos la nueva función renombrada
     return crud.obtener_historial_visualizaciones(session)
 
 @router.get("/estadisticas")
 def estadisticas_visualizaciones(session = Depends(get_session)):
-    """
-    Obtiene estadísticas sobre la cantidad de visualizaciones por título.
-    """
     # Usamos la nueva función renombrada
     return crud.obtener_estadisticas_visualizaciones(session)
 
