@@ -33,4 +33,4 @@ def decode_token(token: str):
 
 def auth_required(credentials = Depends(security)):
     token = credentials.credentials
-    return validate_token(token)
+    return decode_token(token)

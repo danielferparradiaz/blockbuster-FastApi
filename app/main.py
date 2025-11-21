@@ -30,13 +30,45 @@ def custom_openapi():
             "bearerFormat": "JWT"
         }
     }
+    for path in openapi_schema["paths"].values():
+        for method in path.values():
+            method.setdefault("security", [{"HTTPBearer": []}])
 
-    schema["security"] = [{"BearerAuth": []}]
-    app.openapi_schema = schema
-    return schema
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
 
 
-app.openapi = custom_openapi
+# @app.post("/login")
+# def login(credentials: dict):
+#     email = credentials["email"]
+#     password = credentials["password"]
+
+#     # 1. Buscar usuario en BD
+#     user = get_user_by_email(email)
+
+#     if not user or user.password != password:
+#         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+
+#     # 2. Verificar que el usuario tenga membresía
+#     if not user.FechaInicioMembresia or not user.FechaFinMembresia:
+#         raise HTTPException(
+#             status_code=403,
+#             detail="El usuario no tiene membresía configurada"
+#         )
+
+#     # 3. Crear token usando jwt_manager
+#     token = create_token(
+#         user_id=user.IdAfiliado,
+#         role=user.rol,
+#         membership_start=str(user.FechaInicioMembresia),
+#         membership_end=str(user.FechaFinMembresia)
+#     )
+
+#     return {
+#         "access_token": token,
+#         "token_type": "bearer"
+#     }    
+
 
 
 @app.post("/login")
@@ -53,3 +85,4 @@ def login():
 app.include_router(visualizacion_routes.router)
 app.include_router(afiliado_routes.router)
 app.include_router(titulo_routes.router)
+
