@@ -4,7 +4,6 @@ MATCH (n) DETACH DELETE n;
 
 // =========================================
 // 🧍‍♂️ NODOS: AFILIADOS (con membresía)
-// TODO 1 aplicado
 CREATE
   (a101:Afiliado {
     IdAfiliado:101, Nombres:'Antonio', Apellidos:'Rodríguez',

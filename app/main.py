@@ -77,7 +77,7 @@ def login():
         user_id=1,
         role="usuario",
         membership_start="2024-01-01",
-        membership_end="2025-01-01"
+        membership_end="2026-01-01"
     )
     return {"token": token}
 
